@@ -8,6 +8,7 @@ import org.testng.ITestResult;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 
 import core.BaseClass;
 import core.CoreActions;
@@ -15,7 +16,7 @@ import utilities.Reporter;
 
 public class BaseTest extends BaseClass{
 
-	@BeforeClass
+	@BeforeMethod
 	public void setUp() {
 		Reporter.getInstance();
 		String browserName=CoreActions.getPropFileData("browsername");
@@ -34,12 +35,13 @@ public class BaseTest extends BaseClass{
 	@AfterMethod
 	public void getResult(ITestResult result) {
 		Reporter.getResult(result);
-	}
-	
-	@AfterClass
-	public void tearDown() {
 		getDriver().quit();
 		threadLocal.remove();
 		Reporter.flush();
 	}
+	
+	/*
+	 * @AfterClass public void tearDown() { getDriver().quit();
+	 * threadLocal.remove(); Reporter.flush(); }
+	 */
 }

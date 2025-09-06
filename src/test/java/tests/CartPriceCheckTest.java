@@ -7,42 +7,35 @@ import core.CoreActions;
 import pageobjects.HomePage;
 import pageobjects.LandingPage;
 import pageobjects.LoginPage;
+import pageobjects.ProductsListingPage;
+import pageobjects.ViewCartPage;
 import utilities.Log;
 import utilities.Reporter;
 
-public class SigninTest extends BaseTest{
-
+public class CartPriceCheckTest extends BaseTest{
 	LandingPage landingPage;
 	LoginPage loginPage;
 	HomePage homePage;
+	ProductsListingPage productsListingPage;
+	ViewCartPage viewCartPage;
 	
 	@Test
-	public void signinTest() {
+	public void checkprice() {
 		Log.stratTestCase(this.getClass().getSimpleName());
 		Reporter.setTestName(this.getClass().getSimpleName());
 		landingPage=new LandingPage(getDriver());
 		homePage=new HomePage(getDriver());
 		loginPage=new LoginPage(getDriver());
+		productsListingPage=new ProductsListingPage(getDriver());
+		viewCartPage=new ViewCartPage(getDriver());
 		String email=CoreActions.getPropFileData("email");
 		String password=CoreActions.getPropFileData("pwd");
 		landingPage.clickLoginLink();
 		loginPage.login(email, password);
-		Assert.assertTrue(homePage.verifyDeleteAccountDisplayed());
+		homePage.clickOnProductsTab();
+		productsListingPage.addProductAndGoToCart();
+		Assert.assertEquals(viewCartPage.getPrice(), viewCartPage.getTotalPrice());
 		Log.endTestCase(this.getClass().getSimpleName());
 	}
 	
-	@Test
-	public void availableBrandCheck() {
-		Log.stratTestCase(this.getClass().getSimpleName());
-		Reporter.setTestName(this.getClass().getSimpleName());
-		landingPage=new LandingPage(getDriver());
-		homePage=new HomePage(getDriver());
-		loginPage=new LoginPage(getDriver());
-		String email=CoreActions.getPropFileData("email");
-		String password=CoreActions.getPropFileData("pwd");
-		landingPage.clickLoginLink();
-		loginPage.login(email, password);
-		homePage.printAvailableProductsLink();
-		Log.endTestCase(this.getClass().getSimpleName());
-	}
 }

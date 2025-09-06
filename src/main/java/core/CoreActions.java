@@ -1,7 +1,6 @@
 package core;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Properties;
@@ -12,6 +11,8 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import exceptionHandler.ErrorCode;
+import exceptionHandler.FrameworkLevelExceptionalHandler;
 import testdata.FilesLocation;
 import utilities.Log;
 import utilities.Reporter;
@@ -25,13 +26,14 @@ public class CoreActions extends BaseClass{
 			Log.info("Clicked on "+elementName);
 			Reporter.setMethodMessage("Clicked on "+elementName);
 		}catch(Exception e) {
-			JavascriptExecutor jse=(JavascriptExecutor) getDriver();
-			jse.executeScript("arguments[0].click();", element);
-			Log.info("Clicked on "+elementName);
-			Reporter.setMethodMessage("Clicked on "+elementName+" using JS");
-		}finally {
-			Log.info("Fail: couldn't click on "+element);
-			Reporter.setMethodMessage("Fail: couldn't click on "+element);
+			try {
+				JavascriptExecutor jse=(JavascriptExecutor) getDriver();
+				jse.executeScript("arguments[0].click();", element);
+				Log.info("Clicked on "+elementName);
+				Reporter.setMethodMessage("Clicked on "+elementName+" using JS");
+			}catch(Exception e1) {
+				throw new FrameworkLevelExceptionalHandler("Couldn't click on "+e.getMessage(), ErrorCode.UnableToPerformSeleniumClickActionException);
+			}	
 		}
 	}
 	
@@ -43,13 +45,14 @@ public class CoreActions extends BaseClass{
 			Log.info("Text entered is "+text);
 			Reporter.setMethodMessage("Text entered is "+text);
 		}catch(Exception e) {
-			Actions act=new Actions(getDriver());
-			act.moveToElement(element).sendKeys(text);
-			Log.info("Text entered is "+text);
-			Reporter.setMethodMessage("Text entered is "+text);
-		}finally {
-			Log.info("Fail: couldn't enter text "+text);
-			Reporter.setMethodMessage("Fail: couldn't enter text "+text);
+			try {
+				Actions act=new Actions(getDriver());
+				act.moveToElement(element).sendKeys(text);
+				Log.info("Text entered is "+text);
+				Reporter.setMethodMessage("Text entered is "+text);
+			}catch(Exception e1) {
+				throw new FrameworkLevelExceptionalHandler("Unable to enter text:"+e1.getMessage(), ErrorCode.UnableToPerformSeleniumSetTextActionException);
+			}
 		}
 	}
 	
@@ -72,6 +75,18 @@ public class CoreActions extends BaseClass{
 			value=prop.getProperty(key);
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+		return value;
+	}
+	
+	public static String getElementText(WebElement element) {
+		String value="";
+		try {
+			waitForElementToBeDisplayed(element);
+			value=element.getText();
+			Log.info("Text value retrieved: "+value);
+		}catch(Exception e) {
+			e.getMessage();
 		}
 		return value;
 	}
